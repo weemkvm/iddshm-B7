@@ -1,0 +1,19 @@
+# Build artifacts
+build/
+*.o
+*.ko
+*.cmd
+*.a
+*.so
+*.dll
+*.exe
+*.pdb
+*.lib
+*.exp
+
+# Editor / OS
+*.swp
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
