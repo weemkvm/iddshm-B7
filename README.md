@@ -1,6 +1,6 @@
 # IDDShm-B7
 
-A fork of [Looking Glass](https://github.com/gnif/LookingGlass) (B4 tree) that
+A fork of [Looking Glass](https://github.com/gnif/LookingGlass) (B7 tree) that
 replaces the guest-side capture with a rebranded **Indirect Display Driver**
 (IDD). This is the "IDDShm" variant: the Windows guest presents a virtual
 display through the IDD (built as `IDDShm.dll` / `Root\IDDShm`) and pushes
