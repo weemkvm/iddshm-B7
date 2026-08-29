@@ -38,8 +38,8 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject, _In_ PUNICODE_STRING Reg
   TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
   WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-  attributes.EvtCleanupCallback = IDDShmEvtDriverContextCleanup;
-  WDF_DRIVER_CONFIG_INIT(&config, IDDShmEvtDeviceAdd);
+  attributes.EvtCleanupCallback = ElgDispEvtDriverContextCleanup;
+  WDF_DRIVER_CONFIG_INIT(&config, ElgDispEvtDeviceAdd);
 
   CPlatformInfo::Init();
   status = WdfDriverCreate(DriverObject, RegistryPath, &attributes, &config, WDF_NO_HANDLE);
@@ -58,18 +58,18 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject, _In_ PUNICODE_STRING Reg
   return status;
 }
 
-NTSTATUS IDDShmEvtDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT DeviceInit)
+NTSTATUS ElgDispEvtDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_INIT DeviceInit)
 {
   NTSTATUS status;
   UNREFERENCED_PARAMETER(Driver);
 
   TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-  status = IDDShmCreateDevice(DeviceInit);
+  status = ElgDispCreateDevice(DeviceInit);
   TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
   return status;
 }
 
-VOID IDDShmEvtDriverContextCleanup(_In_ WDFOBJECT DriverObject)
+VOID ElgDispEvtDriverContextCleanup(_In_ WDFOBJECT DriverObject)
 {
   UNREFERENCED_PARAMETER(DriverObject);
 

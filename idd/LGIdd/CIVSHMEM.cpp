@@ -88,7 +88,7 @@ bool CIVSHMEM::Init()
   IVSHMEMData * device = nullptr;
   DWORD shmDevice = 0;
 
-  if (RegOpenKeyA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Looking Glass", &hkeyLG) == ERROR_SUCCESS)
+  if (RegOpenKeyA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Elgato Systems", &hkeyLG) == ERROR_SUCCESS)
   {
     DWORD dataType;
     DWORD dataSize = sizeof(shmDevice);

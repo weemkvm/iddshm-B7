@@ -33,7 +33,7 @@
 #include "CIndirectDeviceContext.h"
 #include "CIndirectMonitorContext.h"
 
-NTSTATUS IDDShmDeviceD0Entry(WDFDEVICE device, WDF_POWER_DEVICE_STATE previousState)
+NTSTATUS ElgDispDeviceD0Entry(WDFDEVICE device, WDF_POWER_DEVICE_STATE previousState)
 {
   UNREFERENCED_PARAMETER(previousState);
   UNREFERENCED_PARAMETER(device);
@@ -44,7 +44,7 @@ NTSTATUS IDDShmDeviceD0Entry(WDFDEVICE device, WDF_POWER_DEVICE_STATE previousSt
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmAdapterInitFinished(IDDCX_ADAPTER adapter, const IDARG_IN_ADAPTER_INIT_FINISHED * args)
+NTSTATUS ElgDispAdapterInitFinished(IDDCX_ADAPTER adapter, const IDARG_IN_ADAPTER_INIT_FINISHED * args)
 {
   auto * wrapper = WdfObjectGet_CIndirectDeviceContextWrapper(adapter);
   if (!NT_SUCCESS(args->AdapterInitStatus))
@@ -54,7 +54,7 @@ NTSTATUS IDDShmAdapterInitFinished(IDDCX_ADAPTER adapter, const IDARG_IN_ADAPTER
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmAdapterCommitModes(IDDCX_ADAPTER adapter, const IDARG_IN_COMMITMODES* args)
+NTSTATUS ElgDispAdapterCommitModes(IDDCX_ADAPTER adapter, const IDARG_IN_COMMITMODES* args)
 {
   UNREFERENCED_PARAMETER(adapter);
   UNREFERENCED_PARAMETER(args);
@@ -78,7 +78,7 @@ static inline void FillSignalInfo(DISPLAYCONFIG_VIDEO_SIGNAL_INFO & mode, DWORD 
   mode.pixelRate        = ((UINT64)vsync) * ((UINT64)width) * ((UINT64)height);
 }
 
-NTSTATUS IDDShmParseMonitorDescription(const IDARG_IN_PARSEMONITORDESCRIPTION* inArgs,
+NTSTATUS ElgDispParseMonitorDescription(const IDARG_IN_PARSEMONITORDESCRIPTION* inArgs,
   IDARG_OUT_PARSEMONITORDESCRIPTION* outArgs)
 {
   outArgs->MonitorModeBufferOutputCount = ARRAYSIZE(DisplayModes);
@@ -97,7 +97,7 @@ NTSTATUS IDDShmParseMonitorDescription(const IDARG_IN_PARSEMONITORDESCRIPTION* i
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmMonitorGetDefaultModes(IDDCX_MONITOR monitor, const IDARG_IN_GETDEFAULTDESCRIPTIONMODES * inArgs,
+NTSTATUS ElgDispMonitorGetDefaultModes(IDDCX_MONITOR monitor, const IDARG_IN_GETDEFAULTDESCRIPTIONMODES * inArgs,
   IDARG_OUT_GETDEFAULTDESCRIPTIONMODES * outArgs)
 {
   UNREFERENCED_PARAMETER(monitor);
@@ -118,7 +118,7 @@ NTSTATUS IDDShmMonitorGetDefaultModes(IDDCX_MONITOR monitor, const IDARG_IN_GETD
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmMonitorQueryTargetModes(IDDCX_MONITOR monitor, const IDARG_IN_QUERYTARGETMODES * inArgs,
+NTSTATUS ElgDispMonitorQueryTargetModes(IDDCX_MONITOR monitor, const IDARG_IN_QUERYTARGETMODES * inArgs,
   IDARG_OUT_QUERYTARGETMODES * outArgs)
 {
   UNREFERENCED_PARAMETER(monitor);
@@ -137,21 +137,21 @@ NTSTATUS IDDShmMonitorQueryTargetModes(IDDCX_MONITOR monitor, const IDARG_IN_QUE
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmMonitorAssignSwapChain(IDDCX_MONITOR monitor, const IDARG_IN_SETSWAPCHAIN* inArgs)
+NTSTATUS ElgDispMonitorAssignSwapChain(IDDCX_MONITOR monitor, const IDARG_IN_SETSWAPCHAIN* inArgs)
 {
   auto * wrapper = WdfObjectGet_CIndirectMonitorContextWrapper(monitor);
   wrapper->context->AssignSwapChain(inArgs->hSwapChain, inArgs->RenderAdapterLuid, inArgs->hNextSurfaceAvailable);
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmMonitorUnassignSwapChain(IDDCX_MONITOR monitor)
+NTSTATUS ElgDispMonitorUnassignSwapChain(IDDCX_MONITOR monitor)
 {
   auto* wrapper = WdfObjectGet_CIndirectMonitorContextWrapper(monitor);
   wrapper->context->UnassignSwapChain();
   return STATUS_SUCCESS;
 }
 
-NTSTATUS IDDShmCreateDevice(_Inout_ PWDFDEVICE_INIT deviceInit)
+NTSTATUS ElgDispCreateDevice(_Inout_ PWDFDEVICE_INIT deviceInit)
 {
   NTSTATUS status;
   IDARG_OUT_GETVERSION ver;
@@ -165,18 +165,18 @@ NTSTATUS IDDShmCreateDevice(_Inout_ PWDFDEVICE_INIT deviceInit)
 
   WDF_PNPPOWER_EVENT_CALLBACKS pnpPowerCallbacks;
   WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
-  pnpPowerCallbacks.EvtDeviceD0Entry = IDDShmDeviceD0Entry;
+  pnpPowerCallbacks.EvtDeviceD0Entry = ElgDispDeviceD0Entry;
   WdfDeviceInitSetPnpPowerEventCallbacks(deviceInit, &pnpPowerCallbacks);
 
   IDD_CX_CLIENT_CONFIG config;
   IDD_CX_CLIENT_CONFIG_INIT(&config);
-  config.EvtIddCxAdapterInitFinished               = IDDShmAdapterInitFinished;
-  config.EvtIddCxAdapterCommitModes                = IDDShmAdapterCommitModes;
-  config.EvtIddCxParseMonitorDescription           = IDDShmParseMonitorDescription;
-  config.EvtIddCxMonitorGetDefaultDescriptionModes = IDDShmMonitorGetDefaultModes;
-  config.EvtIddCxMonitorQueryTargetModes           = IDDShmMonitorQueryTargetModes;
-  config.EvtIddCxMonitorAssignSwapChain            = IDDShmMonitorAssignSwapChain;
-  config.EvtIddCxMonitorUnassignSwapChain          = IDDShmMonitorUnassignSwapChain;
+  config.EvtIddCxAdapterInitFinished               = ElgDispAdapterInitFinished;
+  config.EvtIddCxAdapterCommitModes                = ElgDispAdapterCommitModes;
+  config.EvtIddCxParseMonitorDescription           = ElgDispParseMonitorDescription;
+  config.EvtIddCxMonitorGetDefaultDescriptionModes = ElgDispMonitorGetDefaultModes;
+  config.EvtIddCxMonitorQueryTargetModes           = ElgDispMonitorQueryTargetModes;
+  config.EvtIddCxMonitorAssignSwapChain            = ElgDispMonitorAssignSwapChain;
+  config.EvtIddCxMonitorUnassignSwapChain          = ElgDispMonitorUnassignSwapChain;
 
   status = IddCxDeviceInitConfig(deviceInit, &config);
   if (!NT_SUCCESS(status))

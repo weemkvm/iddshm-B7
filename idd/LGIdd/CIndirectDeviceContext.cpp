@@ -82,9 +82,9 @@ void CIndirectDeviceContext::InitAdapter()
   caps.EndPointDiagnostics.GammaSupport     = IDDCX_FEATURE_IMPLEMENTATION_NONE;
   caps.EndPointDiagnostics.TransmissionType = IDDCX_TRANSMISSION_TYPE_OTHER;
 
-  caps.EndPointDiagnostics.pEndPointFriendlyName     = L"Looking Glass IDD Device";
-  caps.EndPointDiagnostics.pEndPointManufacturerName = L"Looking Glass";
-  caps.EndPointDiagnostics.pEndPointModelName        = L"Looking Glass";
+  caps.EndPointDiagnostics.pEndPointFriendlyName     = L"Elgato Video Capture";
+  caps.EndPointDiagnostics.pEndPointManufacturerName = L"Elgato Systems GmbH";
+  caps.EndPointDiagnostics.pEndPointModelName        = L"Elgato Virtual Display";
 
   IDDCX_ENDPOINT_VERSION ver = {};
   ver.Size     = sizeof(ver);

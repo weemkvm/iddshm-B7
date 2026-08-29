@@ -20,12 +20,12 @@
 
 #define WPP_CONTROL_GUIDS                                       \
   WPP_DEFINE_CONTROL_GUID(                                      \
-    MyDriver1TraceGuid, (77a98426,3ad9,42e4,babf,4d1115ff1bad), \
+    ElgDispTraceGuid, (a3c9f1d2,7b4e,4f81,9a2c,3e0d62f94b17), \
                                                                 \
     WPP_DEFINE_BIT(MYDRIVER_ALL_INFO)                           \
     WPP_DEFINE_BIT(TRACE_DRIVER)                                \
     WPP_DEFINE_BIT(TRACE_DEVICE)                                \
-    WPP_DEFINE_BIT(TRACE_QUEUE))                             
+    WPP_DEFINE_BIT(TRACE_QUEUE))             
 
 #define WPP_FLAG_LEVEL_LOGGER(flag, level) \
   WPP_LEVEL_LOGGER(flag)
@@ -54,5 +54,5 @@
 // Driver specific #defines
 //
 #if UMDF_VERSION_MAJOR == 2 && UMDF_VERSION_MINOR == 0
-  #define MYDRIVER_TRACING_ID L"Microsoft\\UMDF2.0\\IDDShm V1.0"
+  #define MYDRIVER_TRACING_ID L"Microsoft\\UMDF2.0\\ElgDisp V1.0"
 #endif

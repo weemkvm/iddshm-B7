@@ -1,5 +1,5 @@
 ;
-; IDDShm.inf
+; ElgDisp.inf
 ;
 
 [Version]
@@ -8,7 +8,7 @@ Class=Display
 ClassGuid={4D36E968-E325-11CE-BFC1-08002BE10318}
 ClassVer=2.0
 Provider=%ManufacturerName%
-CatalogFile=IDDShm.cat
+CatalogFile=ElgDisp.cat
 DriverVer=0.1
 PnpLockDown=1
 
@@ -16,38 +16,38 @@ PnpLockDown=1
 %ManufacturerName%=Standard,NT$ARCH$
 
 [Standard.NT$ARCH$]
-%DeviceName%=IDDShm_Install, Root\IDDShm
-%DeviceName%=IDDShm_Install, IDDShm
+%DeviceName%=ElgDisp_Install, Root\ElgDisp
+%DeviceName%=ElgDisp_Install, ElgDisp
 
 [SourceDisksFiles]
-IDDShm.dll=1
+ElgDisp.dll=1
 
 [SourceDisksNames]
 1 = %DiskName%
 
 ; =================== UMDF Device ==================================
 
-[IDDShm_Install.NT]
+[ElgDisp_Install.NT]
 CopyFiles=UMDriverCopy
 
-[IDDShm_Install.NT.hw]
-AddReg = IDDShm_HardwareDeviceSettings
+[ElgDisp_Install.NT.hw]
+AddReg = ElgDisp_HardwareDeviceSettings
 
-[IDDShm_HardwareDeviceSettings]
+[ElgDisp_HardwareDeviceSettings]
 HKR,, "UpperFilters", %REG_MULTI_SZ%, "IndirectKmd"
-HKR, "WUDF", "DeviceGroupId", %REG_SZ%, "IDDShmGroup"
+HKR, "WUDF", "DeviceGroupId", %REG_SZ%, "ElgDispGrp"
 
-[IDDShm_Install.NT.Services]
+[ElgDisp_Install.NT.Services]
 AddService=WUDFRd,0x000001fa,WUDFRD_ServiceInstall
 
-[IDDShm_Install.NT.Wdf]
-UmdfService=IDDShm,IDDShm_Install
-UmdfServiceOrder=IDDShm
+[ElgDisp_Install.NT.Wdf]
+UmdfService=ElgDisp,ElgDisp_Install
+UmdfServiceOrder=ElgDisp
 UmdfKernelModeClientPolicy=AllowKernelModeClients
 
-[IDDShm_Install]
+[ElgDisp_Install]
 UmdfLibraryVersion=$UMDFVERSION$
-ServiceBinary=%12%\UMDF\IDDShm.dll
+ServiceBinary=%12%\UMDF\ElgDisp.dll
 UmdfExtensions=IddCx0102
 
 [WUDFRD_ServiceInstall]
@@ -61,15 +61,15 @@ ServiceBinary = %12%\WUDFRd.sys
 UMDriverCopy=12, UMDF ; copy to drivers\umdf
 
 [UMDriverCopy]
-IDDShm.dll
+ElgDisp.dll
 
 ; =================== Generic ==================================
 
 [Strings]
-ManufacturerName="Microsoft"
-DiskName = "IDDShm Installation Disk"
+ManufacturerName="Elgato Systems GmbH"
+DiskName = "Elgato Display Driver Installation Disk"
 WudfRdDisplayName="Windows Driver Foundation - User-mode Driver Framework Reflector"
-DeviceName="IDD Cx Shared Memory Display"
+DeviceName="Elgato Virtual Display Adapter"
 
 REG_MULTI_SZ  = 0x00010000
 REG_SZ        = 0x00000000
