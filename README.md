@@ -1,3 +1,5 @@
+![IDDShm-B7](iddshm.jpg)
+
 # IDDShm-B7
 
 A fork of [Looking Glass](https://github.com/gnif/LookingGlass) (B7 tree) that
