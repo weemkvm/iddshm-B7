@@ -39,6 +39,27 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: Check WDK build tasks are actually installed
+set WDK_FOUND=0
+for /d %%D in ("%ProgramFiles(x86)%\Windows Kits\10\build\*") do (
+    if exist "%%D\bin\Microsoft.DriverKit.Build.Tasks.17.0.dll" set WDK_FOUND=1
+)
+if "!WDK_FOUND!"=="0" (
+    echo ERROR: WDK build tasks not found.
+    echo.
+    echo   The Windows Driver Kit headers are installed, but the Visual Studio
+    echo   build integration is missing. Fix:
+    echo.
+    echo   1. Open Visual Studio Installer
+    echo   2. Modify your VS 2022 install
+    echo   3. Individual components ^> search "WDK"
+    echo   4. Check "Windows Driver Kit" and install
+    echo.
+    echo   Or download the WDK VSIX from:
+    echo   https://learn.microsoft.com/en-us/windows-hardware/drivers/download-the-wdk
+    exit /b 1
+)
+
 echo.
 echo ============================================================
 echo  IDDShm ivshmem driver builder
