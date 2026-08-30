@@ -14,8 +14,8 @@ setlocal EnableDelayedExpansion
 ::    4. Run:  build-ivshmem.bat
 ::
 ::  Outputs:
-::    ivshmem\x64\Release\ivshmem.sys
-::    ivshmem\x64\Release\ivshmem.inf
+::    ivshmem\x64\Win11Release\ivshmem.sys
+::    ivshmem\ivshmem.inf  (patched)
 ::    hwid.txt  (your generated values -- keep this)
 :: ============================================================
 
@@ -23,6 +23,12 @@ setlocal EnableDelayedExpansion
 if not exist "ivshmem\ivshmem.inf" (
     echo ERROR: Run this from the kvm-guest-drivers-windows root.
     echo        ivshmem\ivshmem.inf not found.
+    exit /b 1
+)
+
+if not exist "ivshmem\Public.h" (
+    echo ERROR: ivshmem\Public.h not found.
+    echo        Make sure this is a full kvm-guest-drivers-windows checkout.
     exit /b 1
 )
 
@@ -77,7 +83,7 @@ echo.
     echo #   vendor-id=0x8086,device-id=%DEVICE_ID%
     echo #
     echo # vendor/ivshmem/ivshmem.h GUID line:
-    echo #   DEFINE_GUID(GUID_DEVINTERFACE_IVSHMEM, %GUID_MACRO%);
+    echo #   DEFINE_GUID(GUID_DEVINTERFACE_IVSHMEM, %GUID_MACRO%^);
     echo #
     echo PCI_VENDOR_ID=0x8086
     echo PCI_DEVICE_ID=%DEVICE_ID%
@@ -99,31 +105,54 @@ powershell -NoProfile -Command ^
     "Set-Content 'ivshmem\ivshmem.inf' $f -NoNewline"
 
 :: -----------------------------------------------------------
-::  Patch ivshmem.h -- interface GUID
+::  Patch Public.h -- interface GUID
 :: -----------------------------------------------------------
 
-echo Patching ivshmem\ivshmem.h...
+echo Patching ivshmem\Public.h...
 
 powershell -NoProfile -Command ^
-    "$f = Get-Content 'ivshmem\ivshmem.h' -Raw; " ^
+    "$f = Get-Content 'ivshmem\Public.h' -Raw; " ^
     "$pattern = 'DEFINE_GUID\s*\(\s*GUID_DEVINTERFACE_IVSHMEM\s*,\s*[^)]+\)'; " ^
     "$replacement = 'DEFINE_GUID(GUID_DEVINTERFACE_IVSHMEM, %GUID_MACRO%)'; " ^
     "$f = [regex]::Replace($f, $pattern, $replacement); " ^
-    "Set-Content 'ivshmem\ivshmem.h' $f -NoNewline"
+    "Set-Content 'ivshmem\Public.h' $f -NoNewline"
 
 :: -----------------------------------------------------------
 ::  Build
 :: -----------------------------------------------------------
 
 echo.
-echo Building ivshmem driver (Release x64)...
+echo Building ivshmem driver (Win11 Release x64)...
 echo.
 
-msbuild ivshmem\ivshmem.vcxproj /p:Configuration=Release /p:Platform=x64 /v:minimal
+msbuild ivshmem\ivshmem.vcxproj /p:Configuration="Win11 Release" /p:Platform=x64 /v:minimal
 if errorlevel 1 (
     echo.
-    echo BUILD FAILED
-    exit /b 1
+    echo Win11 config failed, trying Win10 Release...
+    echo.
+    msbuild ivshmem\ivshmem.vcxproj /p:Configuration="Win10 Release" /p:Platform=x64 /v:minimal
+    if errorlevel 1 (
+        echo.
+        echo BUILD FAILED
+        echo.
+        echo Make sure you have:
+        echo   - Visual Studio 2022 with C++ desktop workload
+        echo   - Windows Driver Kit (WDK) matching your SDK version
+        echo   - Running from a Developer Command Prompt
+        exit /b 1
+    )
+    set BUILD_CONFIG=Win10Release
+) else (
+    set BUILD_CONFIG=Win11Release
+)
+
+:: Find the output
+set OUT_DIR=ivshmem\x64\!BUILD_CONFIG!
+if not exist "!OUT_DIR!\ivshmem.sys" (
+    set OUT_DIR=ivshmem\x64\Win11 Release
+    if not exist "!OUT_DIR!\ivshmem.sys" (
+        set OUT_DIR=ivshmem\x64\Win10 Release
+    )
 )
 
 echo.
@@ -131,15 +160,15 @@ echo ============================================================
 echo  Build complete
 echo ============================================================
 echo.
-echo   Driver:  ivshmem\x64\Release\ivshmem.sys
-echo   INF:     ivshmem\x64\Release\ivshmem.inf
+echo   Driver:  !OUT_DIR!\ivshmem.sys
+echo   INF:     ivshmem\ivshmem.inf (patched)
 echo   Config:  hwid.txt
 echo.
 echo Next steps:
-echo   1. Copy ivshmem.sys + ivshmem.inf to the guest
+echo   1. Copy ivshmem.sys + patched ivshmem.inf into the guest
 echo   2. Update your IDDShm repo:
 echo      - vendor/ivshmem/ivshmem.h GUID must match (see hwid.txt)
 echo      - QEMU args must use: vendor-id=0x8086,device-id=%DEVICE_ID%
 echo   3. Rebuild ElgDisp.dll with the matching GUID
-echo   4. Run: dse-patcher.exe ivshmem.inf
+echo   4. In the guest: dse-patcher.exe ivshmem.inf
 echo.
