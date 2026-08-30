@@ -1,12 +1,5 @@
-if (EXISTS "${PROJECT_TOP}/.git" AND (
-    (NOT EXISTS "${PROJECT_TOP}/repos/cimgui/.git") OR
-    (NOT EXISTS "${PROJECT_TOP}/repos/LGMP/.git") OR
-    (NOT EXISTS "${PROJECT_TOP}/repos/PureSpice/.git") OR
-    (NOT EXISTS "${PROJECT_TOP}/repos/cimgui/imgui/.git") OR
-    (NOT EXISTS "${PROJECT_TOP}/repos/wayland-protocols/.git") OR
-    (NOT EXISTS "${PROJECT_TOP}/repos/nanosvg/.git")
-))
-    message(FATAL_ERROR "Submodules are not initialized. Run\n\tgit submodule update --init --recursive")
+if (EXISTS "${PROJECT_TOP}/.git" AND NOT EXISTS "${PROJECT_TOP}/repos/cimgui/CMakeLists.txt")
+    message(FATAL_ERROR "Submodules/repos are not populated. Run\n\tgit submodule update --init --recursive\nor verify repos/ is checked in.")
 endif()
 
 if (EXISTS "${PROJECT_TOP}/.git" AND NOT DEFINED DEVELOPER)

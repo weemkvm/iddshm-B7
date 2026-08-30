@@ -10,6 +10,13 @@ build/
 *.pdb
 *.lib
 *.exp
+*.mod
+*.mod.c
+modules.order
+Module.symvers
+
+# Claude
+CLAUDE.md
 
 # Editor / OS
 *.swp
