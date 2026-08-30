@@ -141,18 +141,19 @@ if errorlevel 1 (
         echo   - Running from a Developer Command Prompt
         exit /b 1
     )
-    set BUILD_CONFIG=Win10Release
+    set BUILD_CONFIG=Win10
 ) else (
-    set BUILD_CONFIG=Win11Release
+    set BUILD_CONFIG=Win11
 )
 
-:: Find the output
-set OUT_DIR=ivshmem\x64\!BUILD_CONFIG!
-if not exist "!OUT_DIR!\ivshmem.sys" (
-    set OUT_DIR=ivshmem\x64\Win11 Release
-    if not exist "!OUT_DIR!\ivshmem.sys" (
-        set OUT_DIR=ivshmem\x64\Win10 Release
-    )
+:: Find the output — WDK puts it in Install\ or objfre_ dirs
+set OUT_DIR=
+for %%P in (
+    "ivshmem\Install\!BUILD_CONFIG!\amd64"
+    "ivshmem\objfre_!BUILD_CONFIG:~0,5!_amd64\amd64"
+    "ivshmem\x64\!BUILD_CONFIG! Release"
+) do (
+    if exist "%%~P\ivshmem.sys" if not defined OUT_DIR set "OUT_DIR=%%~P"
 )
 
 echo.
@@ -160,14 +161,18 @@ echo ============================================================
 echo  Build complete
 echo ============================================================
 echo.
-echo   Driver:  !OUT_DIR!\ivshmem.sys
-echo   INF:     ivshmem\ivshmem.inf (patched)
+if defined OUT_DIR (
+    echo   Driver:  %OUT_DIR%\ivshmem.sys
+) else (
+    echo   Driver:  built (check ivshmem\Install\ or ivshmem\objfre_*\amd64\^)
+)
+echo   INF:     ivshmem\ivshmem.inf (patched^)
 echo   Config:  hwid.txt
 echo.
 echo Next steps:
 echo   1. Copy ivshmem.sys + patched ivshmem.inf into the guest
 echo   2. Update your IDDShm repo:
-echo      - vendor/ivshmem/ivshmem.h GUID must match (see hwid.txt)
+echo      - vendor/ivshmem/ivshmem.h GUID must match (see hwid.txt^)
 echo      - QEMU args must use: vendor-id=0x8086,device-id=%DEVICE_ID%
 echo   3. Rebuild ElgDisp.dll with the matching GUID
 echo   4. In the guest: dse-patcher.exe ivshmem.inf
